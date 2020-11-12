@@ -17,13 +17,10 @@ namespace MordoOnline
     public partial class StartMenu : Form
     {
         private CultureInfo _culture;
-        private string _path;
 
         public StartMenu()
         {
-            _path = Directory.GetCurrentDirectory();
             InitializeComponent();
-            _path = Path.GetFullPath("Mordo");
         }
 
         private void StartMenu_Load(object sender, EventArgs e)
@@ -37,6 +34,7 @@ namespace MordoOnline
                 buttonDataBaseRight.Text = Russian.DataBase;
                 linkLabel.Text = Russian.LinkLabel;
 
+                StartCommandWaitForExit("rename \"%CD%\\scripts_ru\" \"scripts\"");
             }
             else
             {
@@ -62,9 +60,10 @@ namespace MordoOnline
         {
             if (_culture.ToString() == "ru-RU")
             {
-                StartCommandWaitForExit("echo rename \"%CD%\\scripts_ru\" \"scripts\" & rename \"%CD%\\scripts_ru\" \"scripts\" & pause");
-                StartCommand("echo start system\\ru\\Game.exe startgame & start system\\ru\\Game.exe startgame & pause");
-                StartCommandWaitForExit("echo rename \"%CD%\\scripts\" \"scripts_ru\" & rename \"%CD%\\scripts\" \"scripts_ru\" & pause");
+                //StartCommandWaitForExit("rename \"%CD%\\scripts_ru\" \"scripts\"");
+               // StartCommandWaitForExit("TIMEOUT /T 4 /NOBREAK");
+                StartCommand("start system\\ru\\Game.exe startgame");
+                StartCommandWaitForExit("rename \"%CD%\\scripts\" \"scripts_ru\"");
             }
             else
             {
