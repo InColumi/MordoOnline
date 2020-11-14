@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,7 +18,6 @@ namespace MordoOnline
     public partial class StartMenu : Form
     {
         private CultureInfo _culture;
-
         public StartMenu()
         {
             InitializeComponent();
@@ -33,8 +33,6 @@ namespace MordoOnline
                 buttonDataBaseLeft.Text = Russian.DataBase;
                 buttonDataBaseRight.Text = Russian.DataBase;
                 linkLabel.Text = Russian.LinkLabel;
-
-                StartCommandWaitForExit("rename \"%CD%\\scripts_ru\" \"scripts\"");
             }
             else
             {
@@ -46,11 +44,6 @@ namespace MordoOnline
             }
         }
 
-        private void StartMenu_Shown(object sender, EventArgs e)
-        {
-
-        }
-
         private void linkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://mordo.ru/");
@@ -60,28 +53,53 @@ namespace MordoOnline
         {
             if (_culture.ToString() == "ru-RU")
             {
-                //StartCommandWaitForExit("rename \"%CD%\\scripts_ru\" \"scripts\"");
-               // StartCommandWaitForExit("TIMEOUT /T 4 /NOBREAK");
-                StartCommand("start system\\ru\\Game.exe startgame");
-                StartCommandWaitForExit("rename \"%CD%\\scripts\" \"scripts_ru\"");
+                StartGame("scripts_ru");
             }
             else
             {
-                StartCommandWaitForExit("rename \"%CD%\\scripts_en\" \"scripts\"");
-                StartCommand("start system\\ru\\Game.exe startgame");
-                StartCommandWaitForExit("rename \"%CD%\\scripts\" \"scripts_en\"");
+                StartGame("scripts_en");
             }
             this.Close();
         }
 
-        private void StartCommand(string command)
+        private void StartGame(string nameScripts)
         {
-            Process.Start(new ProcessStartInfo
+            try
             {
-                FileName = $"cmd",
-                Arguments = $"/c {command}",
-                WindowStyle = ProcessWindowStyle.Normal
-            });
+                int tries = 10;
+                this.WindowState = FormWindowState.Minimized;
+                StartCommandWaitForExit($"rename {nameScripts} scripts");
+                string path = Directory.GetCurrentDirectory();
+                int countTries = 0;
+                while (Directory.GetDirectories(path).Any(d => d.Split('\\').Any(name => name == "scripts")) == false && countTries <= tries)
+                {
+                    Thread.Sleep(1000);
+                    countTries++;
+                }
+                if (countTries > tries)
+                {
+                    throw new Exception("Программа не нашла папку scripts\n");
+                }
+
+                Process.Start("system\\Game.exe", "startgame");
+                countTries = 0;
+                while (Process.GetProcesses().Any( p => p.MainWindowTitle == "Mordo Online") == false && countTries <= tries)
+                {
+                    Thread.Sleep(1000);
+                    countTries++;
+                }
+                if (countTries > tries)
+                {
+                    throw new Exception("Игра не запустилась.\n");
+                }
+                StartCommandWaitForExit($"rename scripts {nameScripts}");
+            }
+            catch (Exception exc)
+            {
+                this.WindowState = FormWindowState.Normal;
+                StartCommandWaitForExit($"rename scripts {nameScripts}");
+                MessageBox.Show(exc.Message);
+            }
         }
 
         private void StartCommandWaitForExit(string command)
@@ -90,8 +108,8 @@ namespace MordoOnline
             {
                 FileName = $"cmd",
                 Arguments = $"/c {command}",
-                WindowStyle = ProcessWindowStyle.Normal
-            }).WaitForExit();
+                WindowStyle = ProcessWindowStyle.Hidden
+            });
         }
     }
 }

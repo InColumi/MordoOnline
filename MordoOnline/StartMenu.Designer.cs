@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StartMenu));
             this.buttonDataBaseLeft = new System.Windows.Forms.Button();
             this.buttonDataBaseRight = new System.Windows.Forms.Button();
             this.buttonRegistration = new System.Windows.Forms.Button();
@@ -117,14 +118,13 @@
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "StartMenu";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Mordo Online";
+            this.Text = "Start Menu";
             this.Load += new System.EventHandler(this.StartMenu_Load);
-            this.Shown += new System.EventHandler(this.StartMenu_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
